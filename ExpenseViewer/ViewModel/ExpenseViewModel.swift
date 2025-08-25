@@ -22,16 +22,21 @@ final class ExpenseViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
+        // Calling the Objective-C Fetcher
         fetcher.fetchExpenses(withURLString: endpoint) { [weak self] items, error in
+            
+            // Switching to Main Thread
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
 
+                // Handling Errors
                 if error != nil {
                     self.errorMessage = error?.localizedDescription
                     return
                 }
 
+                // Mapping Raw Data to Model
                 // Convert each element into [String: Any] before parsing.
                 let mapped: [Expense] = (items ?? []).compactMap { raw -> Expense? in
                     if let dict = raw as? [String: Any] {

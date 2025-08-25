@@ -17,15 +17,18 @@ final class ExpenseViewerUITests: XCTestCase {
         app.launch()
     }
 
-
     func testExpensesListShowsData() throws {
-        // Wait for splash to disappear
-        sleep(3)
-
         let firstCell = app.cells.firstMatch
-        XCTAssertTrue(firstCell.waitForExistence(timeout: 5), "Expense cell should exist")
 
-        // Verify essential labels
+        // Wait for the first cell to appear (up to 5 seconds)
+        let existsPredicate = NSPredicate(format: "exists == true")
+        let expectation = expectation(for: existsPredicate, evaluatedWith: firstCell, handler: nil)
+        wait(for: [expectation], timeout: 5)
+
+        // Verify the first cell exists
+        XCTAssertTrue(firstCell.exists, "Expense cell should exist")
+
+        // Verify essential labels within the first cell
         XCTAssertTrue(firstCell.staticTexts.element(boundBy: 0).exists, "Title should exist")
         XCTAssertTrue(firstCell.staticTexts.element(boundBy: 1).exists, "Amount should exist")
         XCTAssertTrue(firstCell.staticTexts.element(boundBy: 2).exists, "Date should exist")

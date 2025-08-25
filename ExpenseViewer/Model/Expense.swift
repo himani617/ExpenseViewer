@@ -20,6 +20,7 @@ struct Expense: Identifiable {
         return f
     }()
 
+    // Failable Initializer
     init?(dict: [String: Any]) {
         guard
             let id = dict["id"] as? String,
@@ -29,6 +30,7 @@ struct Expense: Identifiable {
             let date = Expense.iso8601.date(from: dateStr)
         else { return nil }
 
+        // Assigning Values
         self.id = id
         self.title = title
         self.amount = num.decimalValue

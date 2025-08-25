@@ -8,23 +8,34 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    // State Objects
     @StateObject private var viewModel = ExpenseViewModel()
     @StateObject private var reachability = Reachability()
 
     var body: some View {
+        
+        // Navigation & Main UI
         NavigationStack {
             Group {
+                // Content States
                 if viewModel.isLoading {
                     ProgressView("Loading…")
-                } else if let err = viewModel.errorMessage {
+                }
+                // Error State
+                else if let err = viewModel.errorMessage {
                     VStack(spacing: 12) {
                         Text("Failed to load").font(.headline)
                         Text(err).foregroundStyle(.secondary).multilineTextAlignment(.center)
                         Button("Retry") { viewModel.load() }
                     }.padding()
-                } else if viewModel.expenses.isEmpty {
+                }
+                // Empty State
+                else if viewModel.expenses.isEmpty {
                     ContentUnavailableView("No expenses", systemImage: "tray")
-                } else {
+                }
+                // Success State (Expenses Available)
+                else {
                     List(viewModel.expenses) { exp in
                         ExpenseRow(expense: exp)
                     }
@@ -33,6 +44,7 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("💸 Expenses")
+            // Toolbar (Refresh Button)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -42,6 +54,8 @@ struct ContentView: View {
                     }
                 }
             }
+            
+            // Offline Banner
             .overlay(alignment: .bottom) {
                 if !reachability.isOnline {
                     HStack(spacing: 8) {
@@ -57,6 +71,7 @@ struct ContentView: View {
             }
             
         }
+        // Lifecycle Hook
         .onAppear { viewModel.load() }
     }
 }

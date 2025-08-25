@@ -18,11 +18,10 @@ final class ExpenseViewerTests: XCTestCase {
             "date": "2021-07-03T01:50:00+01:00"
         ]
 
-        let exp = Expense(dict: dict)
-        XCTAssertNotNil(exp)
-        XCTAssertEqual(exp?.id, "1")
-        XCTAssertEqual(exp?.title, "Flight to SF")
-        XCTAssertEqual(exp?.amount, 230.50)
+        let exp = try XCTUnwrap(Expense(dict: dict), "Expense parsing failed")
+        XCTAssertEqual(exp.id, "1")
+        XCTAssertEqual(exp.title, "Flight to SF")
+        XCTAssertEqual(exp.amount, 230.50)
     }
 
     func testExpenseFormattedValues() throws {
@@ -33,13 +32,27 @@ final class ExpenseViewerTests: XCTestCase {
             "date": "2021-08-03T01:50:00+01:00"
         ]
 
-        guard let exp = Expense(dict: dict) else {
-            XCTFail("Expense parsing failed")
-            return
-        }
-
-        XCTAssertTrue(exp.formattedAmount.count > 0)
-        XCTAssertTrue(exp.formattedDate.count > 0)
+        let exp = try XCTUnwrap(Expense(dict: dict), "Expense parsing failed")
+        XCTAssertFalse(exp.formattedAmount.isEmpty, "Formatted amount should not be empty")
+        XCTAssertFalse(exp.formattedDate.isEmpty, "Formatted date should not be empty")
     }
 
+    func testExpenseFormattedDatePattern() throws {
+        let dict: [String: Any] = [
+            "id": "3",
+            "title": "Taxi",
+            "amount": 35.75,
+            "date": "2025-08-25T20:00:00+05:30" // Use current date for example
+        ]
+
+        let exp = try XCTUnwrap(Expense(dict: dict), "Expense parsing failed")
+
+        // Used DateFormatter to check expected output
+        let df = DateFormatter()
+        df.dateStyle = .medium
+        df.timeStyle = .short
+
+        let expectedDate = df.string(from: exp.date)
+        XCTAssertEqual(exp.formattedDate, expectedDate, "Formatted date should match DateFormatter output")
+    }
 }

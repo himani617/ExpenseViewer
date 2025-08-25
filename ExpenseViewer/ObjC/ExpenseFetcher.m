@@ -14,6 +14,8 @@
                         completion:(void (^)(NSArray<NSDictionary *> * _Nullable,
                                              NSError * _Nullable))completion
 {
+    
+    // Creating the URL
     NSURL *url = [NSURL URLWithString:urlString];
     if (!url) {
         NSError *err = [NSError errorWithDomain:@"ExpenseFetcher"
@@ -23,12 +25,14 @@
         return;
     }
 
+    // Creating the Network Task
     NSURLSessionDataTask *task =
     [[NSURLSession sharedSession] dataTaskWithURL:url
                                 completionHandler:^(NSData * _Nullable data,
                                                     NSURLResponse * _Nullable response,
                                                     NSError * _Nullable error) {
 
+        //Handling Network Errors
         if (error) { completion(nil, error); return; }
 
         if (!data) {
@@ -39,6 +43,7 @@
             return;
         }
 
+        // Parsing JSON
         NSError *jsonError = nil;
         id json = [NSJSONSerialization JSONObjectWithData:data
                                                   options:0
@@ -53,6 +58,7 @@
             return;
         }
 
+        // Normalizing Data
         NSMutableArray<NSDictionary *> *items = [NSMutableArray array];
 
         for (id obj in (NSArray *)json) {
@@ -75,9 +81,11 @@
             [items addObject:normalized];
         }
 
+        // Returning the Result
         completion(items, nil);
     }];
 
+    // Starting the Task
     [task resume];
 }
 

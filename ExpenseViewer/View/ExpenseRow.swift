@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct ExpenseRow: View {
+    // View Input
     let expense: Expense
     var body: some View {
         HStack {
@@ -25,6 +26,8 @@ struct ExpenseRow: View {
                 .foregroundColor(.blue)
         }
         .padding(.vertical, 4)
+        
+        // Accessibility Support
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(expense.title), \(expense.formattedAmount), \(expense.formattedDate)")
     }
